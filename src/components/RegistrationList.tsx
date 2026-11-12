@@ -19,7 +19,8 @@ export default function RegistrationList() {
               </p>
 
               <p>{registration.email}</p>
-              <p>{registration.course}</p>
+              <p>Course: {registration.course}</p>
+              <p>Year: {registration.yearOfStudy}</p>
 
               <button
                 type="button"

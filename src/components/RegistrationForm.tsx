@@ -1,7 +1,9 @@
 import { courses } from '../data/courses'
 import { useState, type SubmitEvent } from 'react'
-import type { Course} from '../data/courses'
+import type { Course } from '../data/courses'
 import { useRegistrations } from "../context/RegistrationContext";
+import { yearsOfStudy } from "../data/years";
+import type { YearOfStudy } from "../data/years";
 
 
 
@@ -9,6 +11,7 @@ type FormErrors = {
   name?: string
   email?: string
   course?: string
+  yearOfStudy?: string;
 }
 
 
@@ -19,6 +22,8 @@ export default function RegistrationForm() {
   const [course, setCourse] = useState<Course | null>(null);
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [successMessage, setSuccessMessage] = useState<string>("");
+  const [yearOfStudy, setYearOfStudy] = useState<YearOfStudy | null>(null);
+
 
   function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -26,25 +31,32 @@ export default function RegistrationForm() {
     const validationErrors = validate();
     setFormErrors(validationErrors);
 
-    if (Object.keys(validationErrors).length === 0 && course !== null) {
-      // Valid submission
+    if (
+      Object.keys(validationErrors).length === 0 &&
+      course !== null &&
+      yearOfStudy !== null
+    ) {
       addRegistration({
         name: name.trim(),
         email: email.trim(),
-        course
+        course,
+        yearOfStudy
       });
 
-      setSuccessMessage("You have successfully registered for the course!");
+      setSuccessMessage(
+        `${name.trim()}, you've successfully registered for ${course} as a ${yearOfStudy}!`
+      );
 
-      // Reset fields
+      // Reset all fields
       setName("");
       setEmail("");
       setCourse(null);
+      setYearOfStudy(null);
     } else {
-      // Invalid submission
       setSuccessMessage("");
     }
   }
+
 
   function validate(): FormErrors {
     const errors: FormErrors = {};
@@ -72,6 +84,10 @@ export default function RegistrationForm() {
       errors.course = "Please select a course.";
     }
 
+    if (yearOfStudy === null) {
+      errors.yearOfStudy = "Please select your year of study.";
+    }
+
     return errors;
   }
 
@@ -94,6 +110,30 @@ export default function RegistrationForm() {
           {courses.map(course => <option key={course} value={course}>{course}</option>)}
         </select>
         {formErrors.course && <p className="error">{formErrors.course}</p>}
+
+
+        <label htmlFor="student-year">Year of Study</label>
+        <select
+          id="student-year"
+          name="yearOfStudy"
+          value={yearOfStudy ?? ""}
+          onChange={e => setYearOfStudy(e.target.value as YearOfStudy)}
+        >
+          <option value="" disabled>
+            Choose your year
+          </option>
+
+          {yearsOfStudy.map(year => (
+            <option key={year} value={year}>
+              {year}
+            </option>
+          ))}
+        </select>
+
+        {formErrors.yearOfStudy && (
+          <p className="error">{formErrors.yearOfStudy}</p>
+        )}
+
 
         <button type="submit">Register</button>
       </form>
